@@ -21,6 +21,18 @@ router.post(
   userController.createUser
 );
 
+// 로그인 - POST api/user/signin
+router.post(
+  "/signin",
+  [
+    body("email").notEmpty(),
+    body("email").isEmail(),
+    body("password").notEmpty(),
+    body("password").isLength({ min: 6 }),
+  ],
+  userController.signInUser
+);
+
 // 유저 정보 업데이트 - PATCH api/user/:userId
 router.patch("/:userId", userController.updateUser);
 

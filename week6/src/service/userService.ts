@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import { UserCreateDTO } from "./../../../week4/src/interfaces/UserCreateDTO";
 import { PrismaClient } from "@prisma/client";
+import { UserSignInDTO } from "../interfaces/UserSignInDTO";
+import { sc } from "../constants";
 const prisma = new PrismaClient();
 
 // 유저 생성
@@ -19,6 +21,28 @@ const createUser = async (userCreateDto: UserCreateDTO) => {
   });
 
   return data;
+};
+
+// 로그인
+const signIn = async (userSignInDto: UserSignInDTO) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: userSignInDto.email,
+      },
+    });
+    if (!user) return null;
+
+    //? bcrypt가 DB에 저장된 기존 password와 넘겨 받은 password를 대조하고,
+    //? match false시 401을 리턴
+    const isMatch = await bcrypt.compare(userSignInDto.password, user.password);
+    if (!isMatch) return sc.UNAUTHORIZED;
+
+    return user.id;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
 // 유저 전체 조회
@@ -63,6 +87,7 @@ const getUserById = async (userId: number) => {
 
 const userService = {
   createUser,
+  signIn,
   getAllUser,
   updateUser,
   deleteUser,
