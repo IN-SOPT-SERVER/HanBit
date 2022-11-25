@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { userController } from "../controller";
+import auth from "../middlewares/auth";
 
 const router: Router = Router();
 
-router.get("/:userId", userController.getUserById);
+router.get("/:userId", auth, userController.getUserById);
 
 // 전체 유저 조회 - GET api/user
 router.get("/", userController.getAllUser);
