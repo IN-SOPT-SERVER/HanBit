@@ -1,13 +1,20 @@
+import bcrypt from "bcryptjs";
+import { UserCreateDTO } from "./../../../week4/src/interfaces/UserCreateDTO";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // 유저 생성
-const createUser = async (name: string, email: string, age: number) => {
+const createUser = async (userCreateDto: UserCreateDTO) => {
+  // 넘겨받은 password를 bcrypt의 도움을 받아 암호화
+  const salt = await bcrypt.genSalt(10); // 매우 작은 임의의 랜덤 텍스트 salt
+  const password = await bcrypt.hash(userCreateDto.password, salt); // 위에서 랜덤을 생성한 salt를 이용해 암호화
+
   const data = await prisma.user.create({
     data: {
-      userName: name,
-      email,
-      age,
+      userName: userCreateDto?.name,
+      email: userCreateDto.email,
+      age: userCreateDto?.age,
+      password,
     },
   });
 
@@ -24,7 +31,7 @@ const getAllUser = async () => {
 const updateUser = async (userId: number, userName: string) => {
   const data = await prisma.user.update({
     where: {
-      user_id: userId,
+      id: userId,
     },
     data: {
       userName,
@@ -38,7 +45,7 @@ const updateUser = async (userId: number, userName: string) => {
 const deleteUser = async (userId: number) => {
   await prisma.user.delete({
     where: {
-      user_id: userId,
+      id: userId,
     },
   });
 };
@@ -47,7 +54,7 @@ const deleteUser = async (userId: number) => {
 const getUserById = async (userId: number) => {
   const user = await prisma.user.findUnique({
     where: {
-      user_id: userId,
+      id: userId,
     },
   });
 

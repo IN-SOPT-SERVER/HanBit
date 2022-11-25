@@ -1,6 +1,7 @@
 import { Router } from "express";
+import { body } from "express-validator";
 import { userController } from "../controller";
-import auth from "../middlewares/auth";
+import { auth } from "../middlewares";
 
 const router: Router = Router();
 
@@ -10,7 +11,15 @@ router.get("/:userId", auth, userController.getUserById);
 router.get("/", userController.getAllUser);
 
 // 유저 생성 - POST api/user
-router.post("/", userController.createUser);
+router.post(
+  "/",
+  [
+    body("name").notEmpty(),
+    body("email").notEmpty(),
+    body("password").isLength({ min: 6 }),
+  ],
+  userController.createUser
+);
 
 // 유저 정보 업데이트 - PATCH api/user/:userId
 router.patch("/:userId", userController.updateUser);
