@@ -82,7 +82,7 @@ const signInUser = async (req: Request, res: Response) => {
 // 유저 전체 조회
 const getAllUser = async (req: Request, res: Response) => {
   const { page, limit } = req.query;
-  const data = await userService.getAllUser(page, limit);
+  const data = await userService.getAllUser(Number(page), Number(limit));
   return res
     .status(200)
     .json({ status: 200, message: "유저 전체 조회 성공", data });
